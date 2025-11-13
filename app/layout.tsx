@@ -5,6 +5,8 @@ import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
 
+import { ThemeProvider } from "@/components/providers/theme-provider";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -31,8 +33,7 @@ export default async function RootLayout({
   } catch (err) {
     // Auth can throw a SessionTokenError when the session cookie/token is malformed
     // or a stored session in the DB is invalid. Don't crash the whole app —
-    // fall back to an unauthenticated session so the UI renders and we can
-    // diagnose further.
+    // fall back to an unauthenticated session so the UI renders and we can diagnose further.
     // Log the error server-side for debugging.
     // eslint-disable-next-line no-console
     console.error("Auth error while getting session:", err);
@@ -44,7 +45,14 @@ export default async function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
         </body>
       </html>
     </SessionProvider>
