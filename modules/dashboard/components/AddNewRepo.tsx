@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowDown } from "lucide-react";
 import Image from "next/image";
 
-const AddRepo = () => {
+const AddNewRepo = () => {
   return (
     <div
       className="group px-6 py-6 flex flex-row justify-between items-center border rounded-lg bg-muted cursor-pointer 
@@ -14,7 +14,7 @@ const AddRepo = () => {
       <div className="flex flex-row justify-center items-start gap-4">
         <Button
           variant={"outline"}
-          className="flex justify-center items-center bg-white group-hover:bg-[#fff8f8] group-hover:border-[#18ff2f] group-hover:text-[#E93F3F] transition-colors duration-300"
+          className="flex justify-center items-center bg-white group-hover:bg-[#fff8f8] group-hover:border-[#18ff2f] group-hover:text-[#4de93f] transition-colors duration-300"
           size={"icon"}
         >
           <ArrowDown
@@ -45,4 +45,4 @@ const AddRepo = () => {
   );
 };
 
-export default AddRepo;
+export default AddNewRepo;
