@@ -1,6 +1,6 @@
 import React from "react";
 import AddNewButton from "@/modules/dashboard/components/AddNewButton";
-import AddNewRepo from "@/modules/dashboard/components/AddNewButton";
+import AddNewRepo from "@/modules/dashboard/components/AddNewRepo";
 import { getAllPlaygroundForUser } from "@/modules/dashboard/actions";
 import EmptyState from "@/modules/dashboard/components/empty-state";
 import ProjectTable from "@/modules/dashboard/components/ProjectTable";
