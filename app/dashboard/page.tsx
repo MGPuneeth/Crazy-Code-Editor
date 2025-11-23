@@ -4,6 +4,14 @@ import AddNewRepo from "@/modules/dashboard/components/AddNewRepo";
 import { getAllPlaygroundForUser } from "@/modules/dashboard/actions";
 import EmptyState from "@/modules/dashboard/components/empty-state";
 import ProjectTable from "@/modules/dashboard/components/ProjectTable";
+
+import {
+  deleteProjectById,
+  createPlayground,
+  editProjectById,
+  duplicateProjectById,
+} from "@/modules/dashboard/actions/index";
+
 const Page = async () => {
   const playgrounds = await getAllPlaygroundForUser();
 
@@ -20,8 +28,9 @@ const Page = async () => {
         ) : (
           <ProjectTable
             projects={playgrounds || []}
-            onDeleteProject={() => {}}
-            onDuplicarwProject={() => {}}
+            onDeleteProject={deleteProjectById}
+            onUpdateProject={editProjectById}
+            onDuplicateProject={duplicateProjectById}
           />
         )}
       </div>

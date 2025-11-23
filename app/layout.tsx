@@ -7,6 +7,8 @@ import { auth } from "@/auth";
 
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
+import { Toaster } from "@/components/ui/sonner";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -51,7 +53,10 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <div className="flex flex-col min-h-screen">
+              <Toaster />
+              <div className="flex-1">{children}</div>
+            </div>
           </ThemeProvider>
         </body>
       </html>

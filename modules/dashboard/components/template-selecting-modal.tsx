@@ -417,6 +417,7 @@ const TemplateSelectionModal = ({
                 <Label htmlFor="project-name">Project Name</Label>
                 <Input
                   id="project-name"
+                  name="project-name"
                   placeholder="my-awesome-project"
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
@@ -445,7 +446,6 @@ const TemplateSelectionModal = ({
               <Button
                 className="bg-[#18ff2f] hover:bg-[#43d036]"
                 onClick={handleCreateProject}
-                text-white
               >
                 Create Project
               </Button>
