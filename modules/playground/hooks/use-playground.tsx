@@ -8,7 +8,7 @@ import { raw } from "@prisma/client/runtime/library";
 
 interface PlaygroundData {
   id: string;
-  name?: string;
+  title?: string;
   [key: string]: any;
 }
 
