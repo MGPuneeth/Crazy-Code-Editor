@@ -187,7 +187,7 @@ export default function ProjectTable({
                 <TableCell className="font-medium">
                   <div className="flex flex-col">
                     <Link
-                      href={`/playground/{playground.id}`}
+                      href={`/playground/${project.id}`}
                       className="hover:underline"
                     >
                       <span className="font-semibold">{project.title}</span>
@@ -239,7 +239,7 @@ export default function ProjectTable({
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link
-                          href={`/playground/{playground.id}`}
+                          href={`/playground/${project.id}`}
                           className="flex items-center"
                         >
                           <Eye className="h-4 w-4 mr-2" />
@@ -248,7 +248,7 @@ export default function ProjectTable({
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link
-                          href={`/playground/{playground.id}`}
+                          href={`/playground/${project.id}`}
                           target="_blank"
                           className="flex items-center"
                         >

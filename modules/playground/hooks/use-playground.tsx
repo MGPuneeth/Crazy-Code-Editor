@@ -31,12 +31,15 @@ export const usePlayground = (id: string): UsePlaygroundReturn => {
 
   const loadPlaygruond = useCallback(async () => {
     if (!id) return;
+    console.log(id);
 
     try {
       setIsLoading(true);
       setError(null);
 
       const data = await getPlaygroundById(id);
+
+      console.log(data);
 
       //@ts-ignore
       setPlaygroundData(data);
@@ -54,6 +57,7 @@ export const usePlayground = (id: string): UsePlaygroundReturn => {
       //loading template from api if not in saved content
 
       const res = await fetch(`/api/template/${id}`);
+      console.log(res);
 
       if (!res.ok) {
         throw new Error(`Failed to load template: ${res.status}`);
