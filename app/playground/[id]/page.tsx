@@ -15,7 +15,7 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { Save, Bot, Settings, FileText, X } from "lucide-react";
+import { Save, Bot, Settings, FileText, X, Container } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,8 +25,22 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Value } from "@radix-ui/react-select";
-import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 import PlaygroundEditor from "@/modules/playground/components/playground-editor";
+import { writeFileSync } from "node:fs";
+import { UseWebContainer } from "@/modules/webcontainers/hooks/useWebContainer";
+import dynamic from "next/dynamic";
+
+// The webcontainer preview is client-only and relies on browser-only APIs.
+// Load it dynamically with `ssr: false` to avoid server-side rendering/hydration issues.
+const WebContainerPreview = dynamic(
+  () => import("@/modules/webcontainers/components/webcontainer-preview"),
+  { ssr: false }
+);
 
 const MainPlaygroundPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -54,6 +68,15 @@ const MainPlaygroundPage = () => {
     setOpenFiles,
     closeFile,
   } = useFileExplorer();
+
+  const {
+    serverUrl,
+    isLoading: containerLoading,
+    error: containerError,
+    instance,
+    writeFileSync,
+    //@ts-ignore
+  } = UseWebContainer({ templateData });
 
   useEffect(() => {
     setPlaygroundId(id);
@@ -105,7 +128,7 @@ const MainPlaygroundPage = () => {
 
               <div className="flex items-center gap-1">
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger asChild>
                     <Button
                       size="sm"
                       variant="outline"
@@ -222,6 +245,23 @@ const MainPlaygroundPage = () => {
                         onContentChange={() => {}}
                       />
                     </ResizablePanel>
+
+                    {isPreviewVisible && templateData && (
+                      <>
+                        <ResizableHandle />
+                        <ResizablePanel defaultSize={50}>
+                          <WebContainerPreview
+                            templateData={templateData}
+                            instance={instance}
+                            writeFileSync={writeFileSync}
+                            isLoading={containerLoading}
+                            error={containerError ?? ""}
+                            serverUrl={serverUrl ?? ""}
+                            forceResetup={false}
+                          />
+                        </ResizablePanel>
+                      </>
+                    )}
                   </ResizablePanelGroup>
                 </div>
               </div>
