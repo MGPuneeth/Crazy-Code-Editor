@@ -18,7 +18,7 @@ interface WebContainerPreviewProps {
   forceResetup?: boolean;
 }
 
-const WebContainerPreview = ({
+const WebContainerPreview: React.FC<WebContainerPreviewProps> = ({
   templateData,
   serverUrl,
   error,
@@ -206,7 +206,7 @@ const WebContainerPreview = ({
           );
         }
 
-        const startProcess = await instance.spawn("npm", ["run", "start"]);
+        const startProcess = await instance.spawn("npm", ["run", "dev"]);
 
         instance.on("server-ready", (port: number, url: string) => {
           // terminal logic
