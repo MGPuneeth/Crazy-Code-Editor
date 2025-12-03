@@ -22,8 +22,6 @@ This project was built to:
 🔗 **Crazy Code Editor (GitHub Repository)**  
 https://github.com/MGPuneeth/Crazy-Code-Editor
 
-*(Add live deployed link once hosting is enabled — Vercel recommended)*
-
 ---
 
 ## 🛠️ Technologies Used
