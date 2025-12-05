@@ -146,8 +146,22 @@ Generate suggestion:`;
  * Generate suggestion using AI service
  */
 async function generateSuggestion(prompt: string): Promise<string> {
+  // Try to use Ollama first
+  const ollama = await tryOllama(prompt);
+  if (ollama) return ollama;
+
+  // Fallback to mock suggestions
+  return getMockSuggestion();
+}
+
+/**
+ * Try to get suggestion from Ollama
+ */
+async function tryOllama(prompt: string): Promise<string | null> {
   try {
-    // Replace this with your actual AI service call
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+
     const response = await fetch("http://localhost:11434/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -160,7 +174,10 @@ async function generateSuggestion(prompt: string): Promise<string> {
           max_tokens: 300,
         },
       }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       throw new Error(`AI service error: ${response.statusText}`);
@@ -178,14 +195,35 @@ async function generateSuggestion(prompt: string): Promise<string> {
     // Remove cursor markers if present
     suggestion = suggestion.replace(/\|CURSOR\|/g, "").trim();
 
+    console.log("✅ Ollama suggestion:", suggestion.substring(0, 50));
     return suggestion;
   } catch (error) {
-    console.error("AI generation error:", error);
-    return "// AI suggestion unavailable";
+    console.error(
+      "⚠️ Ollama unavailable:",
+      error instanceof Error ? error.message : String(error)
+    );
+    return null;
   }
 }
 
-// Helper functions for code analysis
+/**
+ * Get mock suggestion when AI service is unavailable
+ */
+function getMockSuggestion(): string {
+  const mockSuggestions = [
+    "console.log('suggestion');",
+    "return result;",
+    "const data = await response.json();",
+    "if (condition) {\n  // handle case\n}",
+    ".then(data => data);",
+    "function helper() {\n  // helper function\n}",
+  ];
+
+  const suggestion =
+    mockSuggestions[Math.floor(Math.random() * mockSuggestions.length)];
+  console.log("💡 Mock suggestion:", suggestion.substring(0, 50));
+  return suggestion;
+} // Helper functions for code analysis
 function detectLanguage(content: string, fileName?: string): string {
   if (fileName) {
     const ext = fileName.split(".").pop()?.toLowerCase();
