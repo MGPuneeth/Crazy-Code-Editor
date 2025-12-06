@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import "katex/dist/katex.min.css";
 import Image from "next/image";
+import { timeStamp } from "console";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -133,13 +134,158 @@ export const AIChatSidePanel: React.FC<AIChatSidePanelProps> = ({
     return () => clearTimeout(timeoutId);
   }, [messages, isLoading]);
 
-  const getChatModePrompt = (mode: string, content: string) => {};
+  const getChatModePrompt = (mode: string, content: string) => {
+    switch (mode) {
+      case "review":
+        return `Please review this code and provide detailed suggestions for improvement, including performance, security and best practices: \n\n**Request:** ${content}`;
 
-  const handleSendMessage = async (e: React.FormEvent) => {};
+      case "fix":
+        return `Please fix the issues in this code, including bugs, errors and potential problems: \n\n**Problem:** ${content}`;
 
-  const exportChat = () => {};
+      case "optimize":
+        return `Please analyze this code for performance optimizatinos and suggest improvements: \n\n**Code to Optimize:** ${content}`;
 
-  const filteredMessages = "";
+      default:
+        return content;
+    }
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!input.trim() || isLoading) return;
+
+    const messageType =
+      chatMode === "chat"
+        ? "chat"
+        : chatMode === "review"
+        ? "code_review"
+        : chatMode === "fix"
+        ? "error_fix"
+        : "optimization";
+
+    const newMessage: ChatMessage = {
+      role: "user",
+      content: input.trim(),
+      timestamp: new Date(),
+      id: Date.now().toString(),
+      type: messageType,
+    };
+
+    setMessages((prev) => [...prev, newMessage]);
+    setInput("");
+    setIsLoading(true);
+
+    try {
+      const contextualMessage = getChatModePrompt(chatMode, input.trim());
+
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          // Server expects `message` (string) and `history` (array)
+          message: contextualMessage,
+          history: messages.slice(-10).map((msg) => ({
+            role: msg.role,
+            content: msg.content,
+          })),
+
+          stream: streamResponse,
+          mode: chatMode,
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: data.response,
+            timestamp: new Date(),
+            id: Date.now().toString(),
+            type: messageType,
+            tokens: data.tokens,
+            model: data.model || "AI Assistant",
+          },
+        ]);
+      } else {
+        // Read response body for diagnostics
+        let details = "";
+        try {
+          const txt = await response.text();
+          details = txt;
+        } catch (err) {
+          details = String(err);
+        }
+
+        console.error(
+          "Chat API error",
+          response.status,
+          response.statusText,
+          details
+        );
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content:
+              "Sorry, I encountered an error while processing your request. Please try again",
+            timestamp: new Date(),
+            id: Date.now().toString(),
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error sending message: ", error);
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content:
+            "I'm having trouble connecting right now. Please check your internet connection and try again",
+          timestamp: new Date(),
+          id: Date.now().toString(),
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const exportChat = () => {
+    const chatData = {
+      messages,
+      timeStamp: new Date().toISOString(),
+    };
+
+    const blob = new Blob([JSON.stringify(chatData, null, 2)], {
+      type: "application/json",
+    });
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ai-chat-${new Date().toISOString().split("T")[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const filteredMessages = messages
+    .filter((msg) => {
+      if (filterType === "all") return true;
+      return msg.type === filterType;
+    })
+    .filter((msg) => {
+      if (!searchTerm) return true;
+      return msg.content.toLowerCase().includes(searchTerm.toLowerCase());
+    });
 
   return (
     <TooltipProvider>
